@@ -1,0 +1,44 @@
+import numpy as np
+x=np.array(([0.667, 1],[0.33 ,0.556],[1 ,0.667]),dtype=float)
+y=np.array(([0.92],[0.86],[0.89]),dtype=float)
+
+def sigmoid(x):
+    return 1/(1+np.exp(-x))
+
+def derive_sigmoid(x):
+    return x*(1-x)
+
+n=5000
+inp_neurons=2
+hidden_neurons=3
+out_neurons=1
+lr=0.1
+
+wh=np.random.uniform(size=(inp_neurons,hidden_neurons))
+bh=np.random.uniform(size=(1,hidden_neurons))
+wout=np.random.uniform(size=(hidden_neurons,out_neurons))
+bout=np.random.uniform(size=(1,out_neurons))
+
+for i in range(n):
+    hinp=np.dot(x,wh)+bh
+    hact=sigmoid(hinp)
+    
+    out=np.dot(hact,wout)+bout
+    output=sigmoid(out)
+    
+    #output error
+    output_error=y-output
+    outgrad=derive_sigmoid(output)
+    doutput=output_error*outgrad                   # del(output)
+    
+    #hidden error
+    hidden_error=doutput.dot(wout.T)
+    hiddengrad=derive_sigmoid(hact)
+    dhidden=hidden_error*hiddengrad
+    
+    wout+=hact.T.dot(doutput)*lr
+    bout+=np.sum(doutput,axis=0,keepdims=True)*lr
+    wh+=x.T.dot(dhidden)*lr
+    bh+=np.sum(dhidden,axis=0,keepdims=True)*lr
+    
+print(output)    
